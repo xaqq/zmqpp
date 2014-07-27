@@ -73,6 +73,10 @@ enum class socket_option {
 #ifdef ZMQ_EXPERIMENTAL_LABELS
 	receive_label             = ZMQ_RCVLABEL,          /*!< Received label part - get only */
 #endif
+
+	  plain_server = ZMQ_PLAIN_SERVER,
+	  plain_username = ZMQ_PLAIN_USERNAME,
+	  plain_password = ZMQ_PLAIN_PASSWORD,
 };
 
 }
