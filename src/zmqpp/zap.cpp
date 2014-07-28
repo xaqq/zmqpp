@@ -7,9 +7,10 @@ using namespace zmqpp::zap;
 
 handler::handler(context_t &ctx, iauthenticator *auth):
   rep_(ctx, socket_type::router),
-  authenticator_(auth)
+  authenticator_(auth),
+  is_running_(true)
 {
-  me_ = new actor(std::bind(&handler::run_, this, std::placeholders::_1));
+  me_ = new actor(std::bind(&handler::run, this, std::placeholders::_1));
 }
 
 handler::~handler()
@@ -18,29 +19,49 @@ handler::~handler()
   delete me_;
 }
 
-bool handler::run_(socket *pipe)
+bool handler::run(socket *pipe)
 {
   rep_.bind("inproc://zeromq.zap.01");
+  reactor_.add(*pipe, std::bind(&handler::handle_pipe, this, pipe));
+  reactor_.add(rep_, std::bind(&handler::handle_router, this));
   pipe->send(signal::ok);
-  while (true)
+
+  while (is_running_)
     {
-      message_t msg;
-      message_t response_msg;
-      request req;
-      response r;
-      std::string identity;
-
-      rep_.receive(msg);
-      msg >> identity;
-
-      req = build_request(msg);
-      r = authenticator_->process_request(req);
-
-      response_msg << identity;
-      response_msg << r;
-      rep_.send(response_msg);
+      reactor_.poll();
     }
   return true;
+}
+
+void handler::handle_pipe(socket *pipe)
+{
+  signal s;
+
+  // we only monitor for the stop signal
+  pipe->receive(s);
+  if (s == signal::stop)
+    {
+      is_running_ = false;
+    }
+}
+
+void handler::handle_router()
+{
+  message_t msg;
+  message_t response_msg;
+  request req;
+  response r;
+  std::string identity;
+
+  rep_.receive(msg);
+  msg >> identity;
+
+  req = build_request(msg);
+  r = authenticator_->process_request(req);
+
+  response_msg << identity;
+  response_msg << r;
+  rep_.send(response_msg);
 }
 
 request handler::build_request(message_t &msg)

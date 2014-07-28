@@ -4,6 +4,7 @@
 #include <vector>
 #include "socket.hpp"
 #include "actor.hpp"
+#include "reactor.hpp"
 
 namespace zmqpp
 {
@@ -84,9 +85,27 @@ namespace zmqpp
 
       iauthenticator *authenticator_;
 
-      bool run_(socket *pipe);
+      bool run(socket *pipe);
+
+
+      /**
+       * Called by the internal reactor when something happens on the actor's pipe.
+       */
+      void handle_pipe(socket *pipe);
+
+      /**
+       * Called by internal reactor when a authentication request arrives.
+       */
+      void handle_router();
 
     private:
+      /**
+       * Main loop runs while this is true.
+       * The shutdown order come from the actor's pipe.
+       */
+      bool is_running_;
+      reactor reactor_;
+
       request build_request(message_t &msg);
     };
   };
