@@ -153,7 +153,7 @@ namespace zmqpp
       
       /**
        * Flush the fdRemoveLater_ and sockRemoveLater_ vector, effectively removing
-       * the item for the reactor and poller.
+       * the item from the reactor and poller.
        */
       void flush_remove_later();
 
