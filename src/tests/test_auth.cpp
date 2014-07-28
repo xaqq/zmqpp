@@ -17,22 +17,20 @@ class MyDummyAuth : public zmqpp::zap::iauthenticator
 public:
   zmqpp::zap::response process_request(const zmqpp::zap::request &r)
   {
-    std::cout << "U = " << r.username << ";; req id = " << r.request_id << std::endl;
     if (r.username == "toto" && r.password == "toto_secret")
       {
-	std::cout << "test2" << std::endl;
-	return zmqpp::zap::response(r.request_id, "200", "gj", "toto", "");
+	return zmqpp::zap::response(r.request_id, "200", "Login OK", "llama", "");
       }
     return zmqpp::zap::response(r.request_id, "400", "", "", "");
   }
 };
 
-BOOST_AUTO_TEST_CASE(test_plain)
+BOOST_AUTO_TEST_CASE(test_plain_ok)
 {
   zmqpp::context ctx;
   zmqpp::zap::handler zap_handler(ctx, new MyDummyAuth());
-  zmqpp::socket srv(ctx, zmqpp::socket_type::router);
-  zmqpp::socket client(ctx, zmqpp::socket_type::dealer);
+  zmqpp::socket srv(ctx, zmqpp::socket_type::rep);
+  zmqpp::socket client(ctx, zmqpp::socket_type::req);
 							
   srv.set(zmqpp::socket_option::plain_server, true);
   srv.bind("tcp://*:45451");
@@ -46,12 +44,13 @@ BOOST_AUTO_TEST_CASE(test_plain)
   zmqpp::message ret;
   std::string content;
   srv.receive(ret);
-  
-  ret >> content; // flush identity
   ret >> content;
-  
-  BOOST_CHECK_EQUAL(content, "toto");
 
+  // if we have >= 4.1 we can access msg property and check user id
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR > 1)
+  BOOST_CHECK_EQUAL(ret.get_property("User-Id"), "llama");
+#endif
+  BOOST_CHECK_EQUAL(content, "toto");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

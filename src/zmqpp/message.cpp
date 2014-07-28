@@ -480,4 +480,29 @@ bool message::is_signal() const
     return false;
 }
 
+
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR > 1)
+  std::string message::get_property(const std::string &property)
+  {
+    zmq_msg_t *zmq_raw_msg;
+    try
+      {
+	zmq_raw_msg = &raw_msg();
+      }
+    catch (zmqpp::exception &e) // empty
+      {
+	throw message_property_exception(message_property_exception::EMPTY_MSG);
+      }
+   
+    const char *property_value = zmq_msg_gets(zmq_raw_msg, property.c_str());
+
+    if (property_value == NULL)
+      {
+	// we could check errno, but currently the only error is "property not found"
+	throw message_property_exception(message_property_exception::NOT_FOUND);
+      }
+
+    return std::string(property_value);
+  }
+#endif
 }

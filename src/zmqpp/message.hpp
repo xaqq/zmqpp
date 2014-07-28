@@ -243,6 +243,14 @@ public:
 	 */
 	bool is_signal() const;
 
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR > 1)
+  /**
+   * Returns the string value for the metadata property specified by the property argument.
+   * This method requires ZMQ 4.1
+   */
+  std::string get_property(const std::string &property);
+#endif
+
 private:
 	typedef std::vector<frame> parts_type;
 	parts_type _parts;

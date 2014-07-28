@@ -57,16 +57,38 @@ public:
     /**
      * Represents a failed zmqpp::actor initialization.
      */
-    class actor_initialization_exception : public exception
+  class actor_initialization_exception : public exception
+  {
+  public:
+    
+    actor_initialization_exception() :
+      exception("Actor Initialization Exception")
     {
-    public:
+    }
+    
+  };
+  
 
-	actor_initialization_exception() :
-	exception("Actor Initialization Exception")
-	{
-	}
+  /**
+   * Exception when we have trouble accessing a message's property.
+   * Either the property doesn't not exist, or the zmqpp::message is (or has been)
+   * empty(ed). By empty, we mean the message has 0 frame.
+   */
+  class message_property_exception : public exception
+  {
+  public:
+    enum reason
+      {
+	EMPTY_MSG,
+	NOT_FOUND
+      };
 
-    };
+    message_property_exception(enum reason r) :
+      exception(r == reason::EMPTY_MSG ?
+		"Message has no frame, cannot access property" : 
+		"Cannot find property")
+    {}
+  };
 
 /*!
  * Represents internal zmq errors.
