@@ -362,11 +362,6 @@ bool socket::has_more_parts() const
 // Set socket options for different types of option
 void socket::set(socket_option const option, int const value)
 {
-  if (option == socket_option::plain_username)
-    {
-      throw exception("LOL");
-    }
-
 	switch(option)
 	{
 	// unsigned 64bit Integers
@@ -461,11 +456,6 @@ void socket::set(socket_option const option, int const value)
 
 void socket::set(socket_option const option, bool const value)
 {
-  if (option == socket_option::plain_username)
-    {
-      throw exception("LOL");
-    }
-
 	switch(option)
 	{
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -483,7 +473,9 @@ void socket::set(socket_option const option, bool const value)
 	case socket_option::router_mandatory:
 	case socket_option::xpub_verbose:
 #endif
+#if (ZMQ_VERSION_MAJOR > 3)
 	case socket_option::plain_server:
+#endif
 	{
 		int ivalue = value ? 1 : 0;
 		if (0 != zmq_setsockopt(_socket, static_cast<int>(option), &ivalue, sizeof(ivalue)))
@@ -499,11 +491,6 @@ void socket::set(socket_option const option, bool const value)
 
 void socket::set(socket_option const option, uint64_t const value)
 {
-  if (option == socket_option::plain_username)
-    {
-      throw exception("LOL");
-    }
-
 	switch(option)
 	{
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -525,11 +512,6 @@ void socket::set(socket_option const option, uint64_t const value)
 
 void socket::set(socket_option const option, int64_t const value)
 {
-  if (option == socket_option::plain_username)
-    {
-      throw exception("LOL");
-    }
-
 	switch(option)
 	{
 #if (ZMQ_VERSION_MAJOR == 2)
@@ -559,8 +541,10 @@ void socket::set(socket_option const option, char const* value, size_t const len
 	case socket_option::identity:
 	case socket_option::subscribe:
 	case socket_option::unsubscribe:
+#if (ZMQ_VERSION_MAJOR > 3)
 	case socket_option::plain_username:
 	case socket_option::plain_password:
+#endif
 #if (ZMQ_VERSION_MAJOR > 3) || ((ZMQ_VERSION_MAJOR == 3) && (ZMQ_VERSION_MINOR >= 2))
 	case socket_option::tcp_accept_filter:
 #endif

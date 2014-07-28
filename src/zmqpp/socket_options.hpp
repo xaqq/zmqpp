@@ -74,9 +74,11 @@ enum class socket_option {
 	receive_label             = ZMQ_RCVLABEL,          /*!< Received label part - get only */
 #endif
 
-	  plain_server = ZMQ_PLAIN_SERVER,
-	  plain_username = ZMQ_PLAIN_USERNAME,
-	  plain_password = ZMQ_PLAIN_PASSWORD,
+#if (ZMQ_VERSION_MAJOR > 3)
+	  plain_server = ZMQ_PLAIN_SERVER, /*!< PLAIN authentification - are we a server? */
+	  plain_username = ZMQ_PLAIN_USERNAME, /*!< PLAIN authentification - username (used when client) */
+	  plain_password = ZMQ_PLAIN_PASSWORD, /*!< PLAIN authentification - password (used when client) */
+#endif
 };
 
 }
