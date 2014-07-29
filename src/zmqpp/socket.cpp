@@ -544,6 +544,7 @@ void socket::set(socket_option const option, char const* value, size_t const len
 #if (ZMQ_VERSION_MAJOR > 3)
 	case socket_option::plain_username:
 	case socket_option::plain_password:
+	case socket_option::zap_domain:
 #endif
 #if (ZMQ_VERSION_MAJOR > 3) || ((ZMQ_VERSION_MAJOR == 3) && (ZMQ_VERSION_MINOR >= 2))
 	case socket_option::tcp_accept_filter:

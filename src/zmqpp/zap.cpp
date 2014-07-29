@@ -80,7 +80,7 @@ request handler::build_request(message_t &msg)
   //  msg >> req.client_key;           //  CURVE client public key in ASCII
   //  msg >> req.principal;            //  GSSAPI client principal
 
-  std::cout << "V = " << req.version << std::endl;
+  std::cout << "V = " << req.version << "; I = " << req.identity << "; A = " << req.address  << "; D = " << req.domain << std::endl;
   return req;
 }
 

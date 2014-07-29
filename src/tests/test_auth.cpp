@@ -17,6 +17,8 @@ class MyDummyAuth : public zmqpp::zap::iauthenticator
 public:
   zmqpp::zap::response process_request(const zmqpp::zap::request &r)
   {
+    BOOST_CHECK_EQUAL(r.domain, "auth_domain");
+    BOOST_CHECK_EQUAL(r.identity, "MY_SERVER_IDENTITY");
     if (r.username == "toto" && r.password == "toto_secret")
       {
 	return zmqpp::zap::response(r.request_id, "200", "Login OK", "llama", "");
@@ -33,6 +35,8 @@ BOOST_AUTO_TEST_CASE(test_plain_ok)
   zmqpp::socket client(ctx, zmqpp::socket_type::req);
 							
   srv.set(zmqpp::socket_option::plain_server, true);
+  srv.set(zmqpp::socket_option::identity, "MY_SERVER_IDENTITY");
+  srv.set(zmqpp::socket_option::zap_domain, "auth_domain");
   srv.bind("tcp://*:45451");
 
   client.set(zmqpp::socket_option::plain_username, "toto");
@@ -47,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_plain_ok)
   ret >> content;
 
   // if we have >= 4.1 we can access msg property and check user id
-#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR > 1)
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
   BOOST_CHECK_EQUAL(ret.get_property("User-Id"), "llama");
 #endif
   BOOST_CHECK_EQUAL(content, "toto");

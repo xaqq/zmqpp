@@ -243,7 +243,7 @@ public:
 	 */
 	bool is_signal() const;
 
-#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR > 1)
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
   /**
    * Returns the string value for the metadata property specified by the property argument.
    * This method requires ZMQ 4.1
