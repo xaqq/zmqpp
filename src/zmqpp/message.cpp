@@ -480,7 +480,6 @@ bool message::is_signal() const
     return false;
 }
 
-
 #if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
   std::string message::get_property(const std::string &property)
   {

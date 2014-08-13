@@ -90,6 +90,17 @@ public:
     {}
   };
 
+  /**
+   * Exception thrown by the ZAP handler when a request is invalid.
+   */
+  class zap_invalid_request_exception : public exception
+  {
+  public:
+    zap_invalid_request_exception() :
+      exception("Invalid ZAP request")
+    {}
+  };
+
 /*!
  * Represents internal zmq errors.
  *

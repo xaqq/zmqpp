@@ -1,6 +1,7 @@
 #include "zap.hpp"
 #include "message.hpp"
 #include "zap_auth.hpp"
+#include "exception.hpp"
 #include <functional>
 
 using namespace zmqpp::zap;
@@ -56,8 +57,16 @@ void handler::handle_router()
   rep_.receive(msg);
   msg >> identity;
 
-  req = build_request(msg);
-  r = authenticator_->process_request(req);
+  try 
+    {
+      req = build_request(msg);
+      r = authenticator_->process_request(req);
+    }
+  catch (zmqpp::exception &e)
+    {
+      // request is invalid, send 500 error.
+      r = response("UNKNOWN", "500", "Invalid ZAP request");
+    }
 
   response_msg << identity;
   response_msg << r;
@@ -70,15 +79,26 @@ request handler::build_request(message_t &msg)
 
   msg.pop_front(); // pop delimiter
   msg >> req.version;
+
+  if (req.version != "1.0")
+    throw zap_invalid_request_exception();
+  
   msg >> req.request_id;             //  Sequence number of request
   msg >> req.domain;               //  Server socket domain
   msg >> req.address;              //  Client IP address
   msg >> req.identity;             //  Server socket idenntity
   msg >> req.mechanism;            //  Security mechansim
-  msg >> req.username;             //  PLAIN user name
-  msg >> req.password;             //  PLAIN password, in clear text
-  //  msg >> req.client_key;           //  CURVE client public key in ASCII
-  //  msg >> req.principal;            //  GSSAPI client principal
+
+  // credentials frame(s) vary based on the mechanism
+  if (req.mechanism == "PLAIN")
+    {
+      msg >> req.username;             //  PLAIN user name
+      msg >> req.password;             //  PLAIN password, in clear text
+    }
+  else if (req.mechanism == "CURVE")
+    {
+      msg >> req.client_key;           //  CURVE client public key in ASCII
+    }
 
   std::cout << "V = " << req.version << "; I = " << req.identity << "; A = " << req.address  << "; D = " << req.domain << std::endl;
   return req;
