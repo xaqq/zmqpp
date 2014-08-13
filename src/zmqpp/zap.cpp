@@ -65,6 +65,7 @@ void handler::handle_router()
   catch (zmqpp::exception &e)
     {
       // request is invalid, send 500 error.
+      std::cout << "invalid zap request" << std::endl;
       r = response("UNKNOWN", "500", "Invalid ZAP request");
     }
 
@@ -81,8 +82,10 @@ request handler::build_request(message_t &msg)
   msg >> req.version;
 
   if (req.version != "1.0")
+    {
+      std::cout << "verzion mismatch" << std::endl;
     throw zap_invalid_request_exception();
-  
+    }
   msg >> req.request_id;             //  Sequence number of request
   msg >> req.domain;               //  Server socket domain
   msg >> req.address;              //  Client IP address
@@ -98,6 +101,7 @@ request handler::build_request(message_t &msg)
   else if (req.mechanism == "CURVE")
     {
       msg >> req.client_key;           //  CURVE client public key in ASCII
+      // todo decode binary blob
     }
 
   std::cout << "V = " << req.version << "; I = " << req.identity << "; A = " << req.address  << "; D = " << req.domain << std::endl;
