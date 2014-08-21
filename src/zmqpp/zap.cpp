@@ -65,7 +65,7 @@ void handler::handle_router()
   catch (zmqpp::exception &e)
     {
       // request is invalid, send 500 error.
-      std::cout << "invalid zap request" << std::endl;
+      //      std::cerr << e.what() << std::endl;
       r = response("UNKNOWN", "500", "Invalid ZAP request");
     }
 
@@ -83,8 +83,7 @@ request handler::build_request(message_t &msg)
 
   if (req.version != "1.0")
     {
-      std::cout << "verzion mismatch" << std::endl;
-    throw zap_invalid_request_exception();
+      throw zap_invalid_request_exception("Version mismatch, received {" + req.version + "}");
     }
   msg >> req.request_id;             //  Sequence number of request
   msg >> req.domain;               //  Server socket domain

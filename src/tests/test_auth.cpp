@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(test_plain_ok)
   zmqpp::zap::handler zap_handler(ctx, new MyDummyAuth());
   zmqpp::socket srv(ctx, zmqpp::socket_type::rep);
   zmqpp::socket client(ctx, zmqpp::socket_type::req);
-							
+
   srv.set(zmqpp::socket_option::plain_server, true);
   srv.set(zmqpp::socket_option::identity, "MY_SERVER_IDENTITY");
   srv.set(zmqpp::socket_option::zap_domain, "auth_domain");
@@ -50,7 +50,6 @@ BOOST_AUTO_TEST_CASE(test_plain_ok)
   std::string content;
   srv.receive(ret);
   ret >> content;
-
   // if we have >= 4.1 we can access msg property and check user id
 #if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
   BOOST_CHECK_EQUAL(ret.get_property("User-Id"), "llama");

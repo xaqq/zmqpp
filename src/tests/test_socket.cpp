@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE( test_wait )
     BOOST_CHECK_EQUAL(zmqpp::signal::test, p2.wait());
     BOOST_CHECK_EQUAL(zmqpp::signal::stop, p2.wait());
 }
-
+/*
 BOOST_AUTO_TEST_CASE( sending_large_messages_string )
 {
 	zmqpp::context context;
@@ -463,5 +463,5 @@ BOOST_AUTO_TEST_CASE( sending_large_messages_string )
 	BOOST_CHECK_EQUAL(0, message.compare(received_message));
 	BOOST_CHECK(!puller.has_more_parts());
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()

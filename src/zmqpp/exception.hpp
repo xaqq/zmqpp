@@ -96,8 +96,8 @@ public:
   class zap_invalid_request_exception : public exception
   {
   public:
-    zap_invalid_request_exception() :
-      exception("Invalid ZAP request")
+    zap_invalid_request_exception(const std::string &reason = "") :
+      exception("Invalid ZAP request: " + reason)
     {}
   };
 
