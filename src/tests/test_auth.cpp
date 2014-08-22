@@ -39,7 +39,6 @@ public:
   }
 };
 
-
 #if (ZMQ_VERSION_MAJOR > 3)
 BOOST_AUTO_TEST_CASE(test_plain_ok)
 {

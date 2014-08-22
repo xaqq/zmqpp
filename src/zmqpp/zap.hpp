@@ -18,16 +18,16 @@ namespace zmqpp
      */
     struct request
     {
-      std::string version;              //  Version number, must be "1.0"
-      std::string request_id;             //  Sequence number of request
-      std::string domain;               //  Server socket domain
-      std::string address;              //  Client IP address
-      std::string identity;             //  Server socket idenntity
-      std::string mechanism;            //  Security mechansim
-      std::string username;             //  PLAIN user name
-      std::string password;             //  PLAIN password, in clear text
-      std::string client_key;           //  CURVE client public key in ASCII
-      std::string principal;            //  GSSAPI client principal
+      std::string version;              /*!< Version number, expected to be "1.0" */
+      std::string request_id;           /*!< Sequence number of request */
+      std::string domain;               /*!< Server socket domain */
+      std::string address;              /*!< Client IP address */
+      std::string identity;             /*!< Server socket identiy */
+      std::string mechanism;            /*!< Security mechansim */
+      std::string username;             /*!< PLAIN user name */
+      std::string password;             /*!< PLAIN password, in clear text */
+      std::string client_key;           /*!< CURVE client public key in ASCII */
+      std::string principal;            /*!< GSSAPI client principal */
     };
 
     /**
@@ -59,7 +59,15 @@ namespace zmqpp
     };
 
     /**
-     * This is a base class for a ZAP handler implementation.
+     * This is an implementation of a ZAP handler.
+     *
+     * This class implements a ZAP handler, it binds to "inproc//zeromq.zap.01" and
+     * receives requests (in a blocking fashion).
+     * Request are verified through a zap::iauthenticator object, this allows
+     * for multiple and flexible backend.
+     *
+     * The handlers works in its own thread and use an actor internaly.
+     * When the handler object dies, the actor will be stopped.
      */
     class handler
     {
@@ -83,7 +91,6 @@ namespace zmqpp
       iauthenticator *authenticator_;
 
       bool run(socket *pipe);
-
 
       /**
        * Called by the internal reactor when something happens on the actor's pipe.
