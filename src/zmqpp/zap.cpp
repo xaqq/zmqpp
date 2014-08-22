@@ -59,7 +59,7 @@ void handler::handle_router()
 
   try 
     {
-      req = build_request(msg);
+      msg >> req;
       r = authenticator_->process_request(req);
     }
   catch (zmqpp::exception &e)
@@ -73,10 +73,8 @@ void handler::handle_router()
   rep_.send(response_msg);
 }
 
-request handler::build_request(message_t &msg)
+zmqpp::message &zmqpp::operator>>(zmqpp::message_t &msg, zmqpp::zap::request &req)
 {
-  request req;
-
   msg.pop_front(); // pop delimiter
   msg >> req.version;
 
@@ -102,9 +100,7 @@ request handler::build_request(message_t &msg)
       if (req.client_key.length() != 32)
 	throw zap_invalid_request_exception("Public Key has invalid size (" + std::to_string(req.client_key.length()) + ")");
     }
-
-  std::cout << "V = " << req.version << "; I = " << req.identity << "; A = " << req.address  << "; D = " << req.domain << std::endl;
-  return req;
+  return msg;
 }
 
 zmqpp::message &zmqpp::operator<<(zmqpp::message &msg, const zmqpp::zap::response &rep)

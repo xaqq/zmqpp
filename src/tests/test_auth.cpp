@@ -71,7 +71,6 @@ BOOST_AUTO_TEST_CASE(test_plain_ok)
 }
 #endif
 
-
 #if (ZMQ_VERSION_MAJOR > 3)
 BOOST_AUTO_TEST_CASE(test_curve)
 {
@@ -81,8 +80,7 @@ BOOST_AUTO_TEST_CASE(test_curve)
   zmqpp::socket client(ctx, zmqpp::socket_type::req);
 
   zmqpp::curve::keypair server_key = zmqpp::curve::generate_keypair();
-  std::cout << "Server priv key = " << zmqpp::z85::encode(server_key.secret_key) << std::endl;
-  srv.set(zmqpp::socket_option::curve_server, 1);
+  srv.set(zmqpp::socket_option::curve_server, true);
   srv.set(zmqpp::socket_option::curve_secret_key, server_key.secret_key);
   srv.bind("tcp://*:45452");
 

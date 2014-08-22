@@ -13,13 +13,11 @@ namespace zmqpp
     class iauthenticator;
 
     /**
-     * This class is the representation of a ZAP request.
-     * It is serialize to a zmqpp::message object, and can be extracted from one.
-     * See ZMQ's RFC 27
+     * This struct is the representation of a ZAP request.
+     * See ZMQ's RFC 27.
      */
-    class request
+    struct request
     {
-    public:
       std::string version;              //  Version number, must be "1.0"
       std::string request_id;             //  Sequence number of request
       std::string domain;               //  Server socket domain
@@ -33,11 +31,11 @@ namespace zmqpp
     };
 
     /**
-     * A ZAP response object
+     * This struct is the representation of a ZAP response.
+     * See ZMQ's RFC 27.
      */
-    class response
+    struct response
     {
-    public:
       response(const std::string &request_id = "",
 	       const std::string &status_code = "",
 	       const std::string &status_text = "",
@@ -62,14 +60,13 @@ namespace zmqpp
 
     /**
      * This is a base class for a ZAP handler implementation.
-     * 
      */
     class handler
     {
 
     public:
       /**
-       * Construct a handler object from a zmqpp::context and a 
+       * Construct a handler object from a zmqpp::context and an 
        * iauthenticator object that will authenticate the request.
        * The handler takes ownership of the iauthenticator.
        */
@@ -105,11 +102,16 @@ namespace zmqpp
        */
       bool is_running_;
       reactor reactor_;
-
-      request build_request(message_t &msg);
     };
   };
 
+  /**
+   * Extract a zap::request from a message.
+   */
+  message &operator>>(message_t &msg, zmqpp::zap::request &req);
 
+  /**
+   * Serialize a zap::response into a message.
+   */
   message &operator<<(message &msg, const zmqpp::zap::response &rep);
 };
