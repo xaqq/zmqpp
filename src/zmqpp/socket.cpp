@@ -118,16 +118,16 @@ void socket::close()
 	_socket = nullptr;
 }
 
-bool socket::send(zmqpp::signal sig, int const flags)
+bool socket::send(zmqpp::signal sig, bool dont_block/* = false */)
 {
     message msg(sig);
-    return send(msg, flags);
+    return send(msg, dont_block);
 }
 
-bool socket::receive(zmqpp::signal &sig, int const flags)
+  bool socket::receive(zmqpp::signal &sig, bool dont_block /* = false */)
 {
     message msg;
-    bool ret = receive(msg, normal);
+    bool ret = receive(msg, dont_block);
     if (ret)
     {
         assert(msg.is_signal());
@@ -407,6 +407,16 @@ void socket::set(socket_option const option, int const value)
 	case socket_option::router_mandatory:
 	case socket_option::xpub_verbose:
 #endif
+#if (ZMQ_VERSION_MAJOR >= 4)
+	case socket_option::ipv6:
+	case socket_option::plain_server:
+	case socket_option::conflate:
+	case socket_option::curve_server:
+	case socket_option::probe_router:
+	case socket_option::request_correlate:
+	case socket_option::request_relaxed:
+	case socket_option::router_raw:
+#endif
 		if (value == 0) { set(option, false); }
 		else if (value == 1) { set(option, true); }
 		else { throw exception("attempting to set a boolean option with a non 0 or 1 integer"); }
@@ -424,6 +434,7 @@ void socket::set(socket_option const option, int const value)
 #endif
 
 	// Integers that require +ve numbers
+	case socket_option::backlog:
 #if (ZMQ_VERSION_MAJOR == 2)
 	case socket_option::reconnect_interval_max:
 #else
@@ -436,7 +447,6 @@ void socket::set(socket_option const option, int const value)
 	case socket_option::multicast_hops:
 	case socket_option::rate:
 #endif
-	case socket_option::backlog:
 		if (value < 0) { throw exception("attempting to set a positive only integer option with a negative integer"); }
 		// Integers
 	case socket_option::reconnect_interval:
@@ -477,8 +487,15 @@ void socket::set(socket_option const option, bool const value)
 	case socket_option::router_mandatory:
 	case socket_option::xpub_verbose:
 #endif
-#if (ZMQ_VERSION_MAJOR > 3)
+#if (ZMQ_VERSION_MAJOR >= 4)
+	case socket_option::ipv6:
 	case socket_option::plain_server:
+	case socket_option::conflate:
+	case socket_option::curve_server:
+	case socket_option::probe_router:
+	case socket_option::request_correlate:
+	case socket_option::request_relaxed:
+	case socket_option::router_raw:
 #endif
 	{
 		int ivalue = value ? 1 : 0;
@@ -545,13 +562,16 @@ void socket::set(socket_option const option, char const* value, size_t const len
 	case socket_option::identity:
 	case socket_option::subscribe:
 	case socket_option::unsubscribe:
-#if (ZMQ_VERSION_MAJOR > 3)
-	case socket_option::plain_username:
-	case socket_option::plain_password:
-	case socket_option::zap_domain:
-#endif
 #if (ZMQ_VERSION_MAJOR > 3) || ((ZMQ_VERSION_MAJOR == 3) && (ZMQ_VERSION_MINOR >= 2))
 	case socket_option::tcp_accept_filter:
+#endif
+#if (ZMQ_VERSION_MAJOR >= 4)
+	case socket_option::plain_password:
+	case socket_option::plain_username:
+	case socket_option::zap_domain:
+	case socket_option::curve_public_key:
+	case socket_option::curve_secret_key:
+	case socket_option::curve_server_key:
 #endif
 		if (0 != zmq_setsockopt(_socket, static_cast<int>(option), value, length))
 		{
@@ -612,6 +632,11 @@ void socket::get(socket_option const option, int& value) const
 #ifdef ZMQ_EXPERIMENTAL_LABELS
 	case socket_option::receive_label:
 #endif
+#if (ZMQ_VERSION_MAJOR >= 4)
+	case socket_option::ipv6:
+	case socket_option::plain_server:
+	case socket_option::mechanism:
+#endif
 		if (0 != zmq_getsockopt(_socket, static_cast<int>(option), &value, &value_size))
 		{
 			throw zmq_internal_exception();
@@ -653,6 +678,10 @@ void socket::get(socket_option const option, bool& value) const
 #endif
 #ifdef ZMQ_EXPERIMENTAL_LABELS
 	case socket_option::receive_label:
+#endif
+#if (ZMQ_VERSION_MAJOR >= 4)
+	case socket_option::ipv6:
+	case socket_option::plain_server:
 #endif
 		if (0 != zmq_getsockopt(_socket, static_cast<int>(option), &int_value, &value_size))
 		{
@@ -725,6 +754,14 @@ void socket::get(socket_option const option, std::string& value) const
 #if (ZMQ_VERSION_MAJOR > 3) || ((ZMQ_VERSION_MAJOR == 3) && (ZMQ_VERSION_MINOR >= 2))
 	case socket_option::last_endpoint:
 #endif
+#if (ZMQ_VERSION_MAJOR >= 4)
+	case socket_option::plain_password:
+	case socket_option::plain_username:
+	case socket_option::zap_domain:
+	case socket_option::curve_public_key:
+	case socket_option::curve_secret_key:
+	case socket_option::curve_server_key:
+#endif
 		if(0 != zmq_getsockopt(_socket, static_cast<int>(option), buffer.data(), &size))
 		{
 			throw zmq_internal_exception();
@@ -785,6 +822,17 @@ void socket::track_message(message const& /* message */, uint32_t const parts, b
 	}
 }
 
+#if (ZMQ_VERSION_MAJOR >= 4)
+void socket::monitor(endpoint_t const monitor_endpoint, int events_required)
+{
+	int result = zmq_socket_monitor( _socket, monitor_endpoint.c_str(), events_required );
+
+	if (0 != result)
+	{
+		throw zmq_internal_exception();
+	}
+}
+#endif
 
 signal socket::wait()
 {

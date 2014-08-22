@@ -16,7 +16,7 @@ INCLUDEDIR = $(DESTDIR)$(PREFIX)/include
 # Tools
 #
 
-CXX      = g++
+#CXX      = g++
 LD       = $(CXX)
 AR       = ar
 
@@ -25,9 +25,9 @@ AR       = ar
 #
 
 LIBRARY_NAME     = zmqpp
-VERSION_MAJOR    = 3
-VERSION_MINOR    = 2
-VERSION_REVISION = 0
+VERSION_MAJOR    = 4
+VERSION_MINOR    = 1
+VERSION_REVISION = 1
 
 #
 # Paths
@@ -71,12 +71,8 @@ ifneq (,$(findstring $(CONFIG),release loadtest))
 	CONFIG_FLAGS = -O3 -funroll-loops -ffast-math -finline-functions -fomit-frame-pointer -DNO_DEBUG_LOG -DNO_TRACE_LOG -DNDEBUG
 endif
 
-COMMON_FLAGS = -MMD -std=c++0x -pipe -Wall -fPIC \
+COMMON_FLAGS = -MMD -std=c++11 -pipe -Wall -fPIC \
 	-DBUILD_ENV=$(CONFIG) \
-	-DBUILD_VERSION='"$(APP_VERSION)"' \
-	-DBUILD_VERSION_MAJOR=$(VERSION_MAJOR) \
-	-DBUILD_VERSION_MINOR=$(VERSION_MINOR) \
-	-DBUILD_VERSION_REVISION=$(VERSION_REVISION) \
 	-DBUILD_DATESTAMP='$(APP_DATESTAMP)' \
 	-DBUILD_LIBRARY_NAME='"$(LIBRARY_NAME)"' \
 	-DBUILD_CLIENT_NAME='"$(CLIENT_TARGET)"' \
@@ -124,6 +120,7 @@ all: $(LIBRARY_SHARED) $(LIBRARY_ARCHIVE) $(CLIENT_TARGET)
 check: $(LIBRARY_SHARED) $(LIBRARY_ARCHIVE) test
 
 install:
+	mkdir -p $(INCLUDEDIR)/$(LIBRARY_DIR)
 	install -m 644 $(ALL_LIBRARY_INCLUDES) $(INCLUDEDIR)/$(LIBRARY_DIR)
 	install -m 755 $(BUILD_PATH)/$(LIBRARY_SHARED).$(VERSION_MAJOR) $(LIBDIR)/$(LIBRARY_SHARED).$(APP_VERSION)
 	ln -sf $(LIBRARY_SHARED).$(APP_VERSION) $(LIBDIR)/$(LIBRARY_SHARED).$(VERSION_MAJOR)
