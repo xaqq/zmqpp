@@ -425,7 +425,8 @@ public:
 	 * \param option a valid ::socket_option
 	 * \param pointer to null terminated cstring value to set the option to
 	 */
-	inline void set(socket_option const option, char const* value) { set(option, value, strlen(value)); }
+	inline void set(socket_option const option, char const* value) { 
+	  set(option, value, strlen(value)); }
 
 	/*!
 	 * Set the value of an option in the underlaying zmq socket.
@@ -433,7 +434,8 @@ public:
 	 * \param option a valid ::socket_option
 	 * \param value to set the option to
 	 */
-	inline void set(socket_option const option, std::string const value) { set(option, value.c_str(), value.length()); }
+	inline void set(socket_option const option, std::string const value) { 
+	  set(option, value.c_str(), value.length()); }
 
 	/*!
 	 * Get a socket option from the underlaying zmq socket.

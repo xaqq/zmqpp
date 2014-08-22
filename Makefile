@@ -4,7 +4,7 @@
 
 CONFIG   = max
 CPPFLAGS = 
-CXXFLAGS = 
+CXXFLAGS =  -g
 LDFLAGS  = 
 
 PREFIX = /usr/local

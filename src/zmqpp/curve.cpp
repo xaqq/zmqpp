@@ -4,7 +4,6 @@
  */
 
 #include <vector>
-
 #include <zmq_utils.h>
 
 #include "compatibility.hpp"

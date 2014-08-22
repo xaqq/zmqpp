@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
+#include <cassert>
 
 #include <zmq.h>
 
@@ -251,6 +252,14 @@ public:
 	 * @return true if the message is a signal, false otherwise
 	 */
 	bool is_signal() const;
+
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
+  /**
+   * Returns the string value for the metadata property specified by the property argument.
+   * This method requires ZMQ 4.1
+   */
+  std::string get_property(const std::string &property);
+#endif
 
 private:
 	typedef std::vector<frame> parts_type;
