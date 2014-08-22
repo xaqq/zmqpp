@@ -10,8 +10,7 @@ LDFLAGS  =
 PREFIX = /usr/local
 BINDIR = $(DESTDIR)$(PREFIX)/bin
 LIBDIR = $(DESTDIR)$(PREFIX)/lib
-#INCLUDEDIR = /usr/local/include $(DESTDIR)$(PREFIX)/include
-INCLUDEDIR = /usr/include $(DESTDIR)$(PREFIX)/include
+INCLUDEDIR = $(DESTDIR)$(PREFIX)/include
 
 #
 # Tools
@@ -79,7 +78,7 @@ COMMON_FLAGS = -MMD -std=c++11 -pipe -Wall -fPIC \
 	-DBUILD_CLIENT_NAME='"$(CLIENT_TARGET)"' \
 	-I$(SRC_PATH)
 
-COMMON_LIBS = -lsodium -lzmq
+COMMON_LIBS = -lzmq
 
 LIBRARY_LIBS =  
 
