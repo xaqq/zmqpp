@@ -103,13 +103,6 @@ enum class socket_option {
 #ifdef ZMQ_EXPERIMENTAL_LABELS
 	receive_label             = ZMQ_RCVLABEL,          /*!< Received label part - get only */
 #endif
-
-#if (ZMQ_VERSION_MAJOR > 3)
-	  plain_server = ZMQ_PLAIN_SERVER, /*!< PLAIN authentification - are we a server? */
-	  plain_username = ZMQ_PLAIN_USERNAME, /*!< PLAIN authentification - username (used when client) */
-	  plain_password = ZMQ_PLAIN_PASSWORD, /*!< PLAIN authentification - password (used when client) */
-	  zap_domain = ZMQ_ZAP_DOMAIN, /*!< ZAP: RFC 27 authentication domain */
-#endif
 };
 
 }

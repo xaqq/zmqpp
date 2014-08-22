@@ -4,13 +4,14 @@
 
 CONFIG   = max
 CPPFLAGS = 
-CXXFLAGS = 
+CXXFLAGS =  -g
 LDFLAGS  = 
 
 PREFIX = /usr/local
 BINDIR = $(DESTDIR)$(PREFIX)/bin
 LIBDIR = $(DESTDIR)$(PREFIX)/lib
-INCLUDEDIR = $(DESTDIR)$(PREFIX)/include
+#INCLUDEDIR = /usr/local/include $(DESTDIR)$(PREFIX)/include
+INCLUDEDIR = /usr/include $(DESTDIR)$(PREFIX)/include
 
 #
 # Tools
@@ -78,7 +79,7 @@ COMMON_FLAGS = -MMD -std=c++11 -pipe -Wall -fPIC \
 	-DBUILD_CLIENT_NAME='"$(CLIENT_TARGET)"' \
 	-I$(SRC_PATH)
 
-COMMON_LIBS = -lzmq
+COMMON_LIBS = -lsodium -lzmq
 
 LIBRARY_LIBS =  
 

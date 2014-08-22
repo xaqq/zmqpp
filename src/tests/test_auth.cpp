@@ -8,6 +8,8 @@
 #include "zmqpp/poller.hpp"
 #include "zmqpp/zap.hpp"
 #include "zmqpp/zap_auth.hpp"
+#include "zmqpp/curve.hpp"
+#include "zmqpp/z85.hpp"
 #include <iostream>
 
 BOOST_AUTO_TEST_SUITE( auth )
@@ -26,6 +28,17 @@ public:
     return zmqpp::zap::response(r.request_id, "400", "", "", "");
   }
 };
+
+class MyDummyAuthCurve : public zmqpp::zap::iauthenticator
+{
+public:
+  zmqpp::zap::response process_request(const zmqpp::zap::request &r)
+  {
+    //accept all, and set User-Id to the z85 encoded client's publid key
+    return zmqpp::zap::response(r.request_id, "200", "OK", zmqpp::z85::encode(r.client_key), "");
+  }
+};
+
 
 #if (ZMQ_VERSION_MAJOR > 3)
 BOOST_AUTO_TEST_CASE(test_plain_ok)
@@ -50,13 +63,49 @@ BOOST_AUTO_TEST_CASE(test_plain_ok)
   std::string content;
   srv.receive(ret);
   ret >> content;
-  // if we have >= 4.1 we can access msg property and check user id
+// if we have >= 4.1 we can access msg property and check user id
 #if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
   BOOST_CHECK_EQUAL(ret.get_property("User-Id"), "llama");
 #endif
   BOOST_CHECK_EQUAL(content, "toto");
 }
 #endif
+
+
+#if (ZMQ_VERSION_MAJOR > 3)
+BOOST_AUTO_TEST_CASE(test_curve)
+{
+  zmqpp::context ctx;
+  zmqpp::zap::handler zap_handler(ctx, new MyDummyAuthCurve());
+  zmqpp::socket srv(ctx, zmqpp::socket_type::rep);
+  zmqpp::socket client(ctx, zmqpp::socket_type::req);
+
+  zmqpp::curve::keypair server_key = zmqpp::curve::generate_keypair();
+  std::cout << "Server priv key = " << zmqpp::z85::encode(server_key.secret_key) << std::endl;
+  srv.set(zmqpp::socket_option::curve_server, 1);
+  srv.set(zmqpp::socket_option::curve_secret_key, server_key.secret_key);
+  srv.bind("tcp://*:45452");
+
+  zmqpp::curve::keypair client_key = zmqpp::curve::generate_keypair();
+  client.set(zmqpp::socket_option::curve_server_key, server_key.public_key);
+  client.set(zmqpp::socket_option::curve_public_key, client_key.public_key);
+  client.set(zmqpp::socket_option::curve_secret_key, client_key.secret_key);
+  client.connect("tcp://localhost:45452");
+
+  client.send("data_blabla");
+
+  zmqpp::message ret;
+  std::string content;
+  srv.receive(ret);
+  ret >> content;
+  BOOST_CHECK_EQUAL(content, "data_blabla");
+// if we have >= 4.1 we can access msg property and check user id
+#if (ZMQ_VERSION_MAJOR == 4 && ZMQ_VERSION_MINOR >= 1)
+  BOOST_CHECK_EQUAL(ret.get_property("User-Id"), client_key.public_key);
+#endif
+}
+#endif
+
 
 #if (ZMQ_VERSION_MAJOR > 3)
 BOOST_AUTO_TEST_CASE(test_invalid_req1)
@@ -121,5 +170,6 @@ BOOST_AUTO_TEST_CASE(test_invalid_req2)
   BOOST_CHECK_EQUAL(rep_status_txt, "Invalid ZAP request");
 }
 #endif
+
 
 BOOST_AUTO_TEST_SUITE_END()

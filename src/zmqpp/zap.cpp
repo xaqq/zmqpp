@@ -65,7 +65,6 @@ void handler::handle_router()
   catch (zmqpp::exception &e)
     {
       // request is invalid, send 500 error.
-      //      std::cerr << e.what() << std::endl;
       r = response("UNKNOWN", "500", "Invalid ZAP request");
     }
 
@@ -100,7 +99,8 @@ request handler::build_request(message_t &msg)
   else if (req.mechanism == "CURVE")
     {
       msg >> req.client_key;           //  CURVE client public key in ASCII
-      // todo decode binary blob
+      if (req.client_key.length() != 32)
+	throw zap_invalid_request_exception("Public Key has invalid size (" + std::to_string(req.client_key.length()) + ")");
     }
 
   std::cout << "V = " << req.version << "; I = " << req.identity << "; A = " << req.address  << "; D = " << req.domain << std::endl;
