@@ -15,7 +15,9 @@ if [ $TRAVIS_PULL_REQUEST != "false" ]; then
 fi
 
 DEPLOY_URL="https://${GH_TOKEN}@github.com/xaqq/zmqpp-doc.git"
-
+pwd
+ls
+ls ../
 git clone $DEPLOY_URL -b gh-pages
 touch docs/doxygen-log
 doxygen > docs/doxygen-log || { echo "Failed to build doc"; exit 1; }
