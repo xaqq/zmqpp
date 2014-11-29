@@ -417,7 +417,7 @@ public:
 	 * \param pointer to raw byte value to set the option to
 	 * \param length the size of the raw byte value
 	 */
-	void set(socket_option const option, char const* value, size_t const length);
+	void set(socket_option const option, char const* pointer, size_t const length);
 
 	/*!
 	 * Set the value of an option in the underlaying zmq socket.
