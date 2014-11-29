@@ -46,13 +46,15 @@ before_script:
   - sudo make install
   - sudo ldconfig
   - cd ../
-
+ 
+env:
+ global:
+   - secure: "Oj0n49ah6i5Na4xrROrjIrJ5R2bEpSktonW3FUZFyrecJTZjasNmShED3SK1X32/XAYmCv7wRVuNqzfUCmVQLY7JV08aOJ91Pa7Dj0Z7LU7xntXQtL8Rj26puh7D1/KUcM8WdfcgBnT1qgU3aQ7T/8VY68zT5WIlth4SHbWD3lo="
+ 
 script:
   - make CXXFLAGS='-DTRAVIS_CI_BUILD' check
   - make clean ; make CUSTOM_INCLUDE_PATH='-I/tmp/ZMQ3/include' COMMON_LIBS='-L/tmp/ZMQ3/lib/ -lzmq' check
   ## now try to build using cmake just as a sanity check
   - rm -rf build && mkdir build && cd build && cmake ../ -DZMQPP_BUILD_STATIC=0 -DZMQPP_BUILD_TESTS=1 && make && ./zmqpp-test-runner;
   - cd ../ && ./build_pub_doc.sh;
-  
-env:
- - secure: "Oj0n49ah6i5Na4xrROrjIrJ5R2bEpSktonW3FUZFyrecJTZjasNmShED3SK1X32/XAYmCv7wRVuNqzfUCmVQLY7JV08aOJ91Pa7Dj0Z7LU7xntXQtL8Rj26puh7D1/KUcM8WdfcgBnT1qgU3aQ7T/8VY68zT5WIlth4SHbWD3lo="
+ 
