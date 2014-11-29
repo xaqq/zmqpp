@@ -17,7 +17,7 @@ fi
 DEPLOY_URL="https://${GH_TOKEN}@github.com/xaqq/zmqpp-doc.git"
 git clone $DEPLOY_URL -b gh-pages
 mkdir docs
-doxygen > docs/doxygen-log || { echo "Failed to build doc"; exit 1; }
+doxygen > docs/doxygen-out 2> docs/doxygen-err || { echo "Failed to build doc"; exit 1; }
 
 # Remove doc for current branch
 rm -rf ${TRAVIS_BRANCH}
@@ -26,12 +26,13 @@ rm -rf ${TRAVIS_BRANCH}
 mkdir -p zmqpp-doc/${TRAVIS_BRANCH}
 cp -R docs/html zmqpp-doc/${TRAVIS_BRANCH}
 # Copy doxygen log file.
-cp docs/doxygen-log zmqpp-doc/${TRAVIS_BRANCH}
+cp docs/doxygen-{err,out} zmqpp-doc/${TRAVIS_BRANCH}
 
 cd zmqpp-doc
 git config user.email "travis-ci@automated-commit.org"
 git config user.name "TravisCI"
-git add html
+git add doxygen-{err,out}
+git add ${TRAVIS_BRANCH}
 git commit -am "Updating documentation for branch ${TRAVIS_BRANCH}"
 git push origin gh-pages
 
