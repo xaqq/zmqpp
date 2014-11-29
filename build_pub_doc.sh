@@ -9,9 +9,11 @@ doxygen || { echo "Failed to build doc"; exit 1; }
 rm -rf zmqpp-doc/html
 
 #cp new doc
-cp -R docs/html zmqpp
+cp -R docs/html zmqpp-doc
 
 cd zmqpp-doc
+ls
+pwd
 git config user.email "kapp.arno@gmail.com"
 git config user.name "xaqq"
 git add html
