@@ -12,7 +12,8 @@ install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
   # Requirements
   - sudo apt-get install libboost-all-dev
-  - sudo apt-get install doxygen
+  # Doxygen + tools to generate graph
+  - sudo apt-get install doxygen graphviz
 
 before_script:
   # Build, check, and install libsodium
@@ -56,5 +57,7 @@ script:
   - make clean ; make CUSTOM_INCLUDE_PATH='-I/tmp/ZMQ3/include' COMMON_LIBS='-L/tmp/ZMQ3/lib/ -lzmq' check
   ## now try to build using cmake just as a sanity check
   - rm -rf build && mkdir build && cd build && cmake ../ -DZMQPP_BUILD_STATIC=0 -DZMQPP_BUILD_TESTS=1 && make && ./zmqpp-test-runner;
+
+after_success:
   - cd ../ && ./build_pub_doc.sh;
  
