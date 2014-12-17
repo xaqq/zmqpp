@@ -5,8 +5,7 @@ language: cpp
 before_install:
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
   # Use trusty repo for an up to date cmake version
-  - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main unive\
-rse"
+  - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main universe"
   - sudo apt-get update
 
 install:
