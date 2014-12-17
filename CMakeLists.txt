@@ -11,7 +11,7 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 enable_testing()
 
 # prepare C++11
@@ -56,7 +56,6 @@ set( IS_TRAVIS_CI_BUILD   true    CACHE bool "Defines TRAVIS_CI_BUILD - Should t
 
 # Find zmq.h and add its dir to the includes
 find_path(ZEROMQ_INCLUDE zmq.h PATHS ${ZEROMQ_INCLUDE_DIR})
-include_directories(${ZEROMQ_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/src )
 
 # Do not run some tests when building on travis-ci (this cause oom error and kill the test
 # process)
@@ -96,6 +95,7 @@ set( LIBZMQPP_SOURCES
 # Staticlib
 if (ZMQPP_BUILD_STATIC)
   add_library( zmqpp-static STATIC ${LIBZMQPP_SOURCES})
+  target_include_directories(zmqpp-static PRIVATE ${ZEROMQ_INCLUDE_DIR} ${ZEROMQ_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/src)
   if (NOT ZMQPP_LIBZMQ_CMAKE)
     find_library(ZEROMQ_LIBRARY_STATIC ${ZMQPP_LIBZMQ_NAME_STATIC} PATHS ${ZEROMQ_LIB_DIR})
     target_link_libraries( zmqpp-static ${ZEROMQ_LIBRARY_STATIC} )
@@ -111,6 +111,7 @@ endif() # ZMQPP_BUILD_STATIC
 # Shared lib
 if (ZMQPP_BUILD_SHARED)
   add_library( zmqpp SHARED ${LIBZMQPP_SOURCES})
+  target_include_directories(zmqpp PRIVATE ${ZEROMQ_INCLUDE_DIR} ${ZEROMQ_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/src)
   if (NOT ZMQPP_LIBZMQ_CMAKE)
     find_library(ZEROMQ_LIBRARY_SHARED ${ZMQPP_LIBZMQ_NAME_SHARED} PATHS ${ZEROMQ_LIB_DIR})
     target_link_libraries( zmqpp ${ZEROMQ_LIBRARY_SHARED} )

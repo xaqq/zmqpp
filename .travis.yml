@@ -4,6 +4,8 @@ language: cpp
 
 before_install:
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+  # Use trusty repo for an up to date cmake version
+  - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main universe"
   - sudo apt-get update
 
 install:
@@ -11,7 +13,8 @@ install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
   # Requirements
-  - sudo apt-get install libboost-all-dev
+  - sudo apt-get install -qq libboost-all-dev
+  - sudo apt-get install -qq cmake
 
 before_script:
   # Build, check, and install libsodium
